@@ -12,12 +12,14 @@ class Arco {
         int peso;
 
     public:
+        // constructor
         Arco(void* pOrigen, void* pDestino, int pPeso) {
             this->origen = pOrigen;
             this->destino = pDestino;
             this->peso = pPeso;
         }
 
+        // getters del arco
         void* getOrigen() {
             return this->origen;
         }

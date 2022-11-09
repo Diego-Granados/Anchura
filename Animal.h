@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// esta clase se utiliza para el ejemplo
 class Animal : public INodo {
     private:
         string nombre;

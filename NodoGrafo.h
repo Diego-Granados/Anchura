@@ -48,6 +48,7 @@ class NodoGrafo {
             return dato;
         }
 
+        // añade el arco a la lista
         void addArc(Arco* pArco) {
             this->listaArcos->push_back(pArco);
         }

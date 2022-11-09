@@ -1,10 +1,13 @@
 #ifndef _GRAFO_
 #define _GRAFO_ 1
-#include "Nodo.h"
+#include <vector>
+#include "NodoGrafo.h"
 #include "INodo.h"
 #include <map>
-#include "List.h"
+#include <queue>
+#include <stack>
 #include "Arco.h"
+#include <iostream>
 
 using namespace std;
 
@@ -14,12 +17,11 @@ class Grafo {
         bool esDirigido = true;
         std::map<int,NodoGrafo*> hashNodos;
 
-
         void resetNodes() {
             for (std::vector<NodoGrafo*>::iterator current = listaNodos.begin() ; current != listaNodos.end(); ++current) {
                 NodoGrafo* actual = (*current);
-                actual->procesado = false;
-                actual->visitado = false;
+                actual->setProcesado(false);
+                actual->setVisitado(false);
             }
         }
 
@@ -27,7 +29,7 @@ class Grafo {
             NodoGrafo* result = nullptr;
             for (std::vector<NodoGrafo*>::iterator current = listaNodos.begin() ; current != listaNodos.end(); ++current) {
                 NodoGrafo* actual = (*current);
-                if (!actual->visitado) {
+                if (!actual->getVisitado()) {
                     result = actual;
                     break;
                 }
@@ -84,13 +86,58 @@ class Grafo {
             return hashNodos.at(pId);
         }
 
-        vector<INodo> deepPath(INodo* pOrigen) {  //recorrido en profundidad
-            vector<INodo> result;
+        vector<INodo*> deepPath(INodo* pOrigen) {  //recorrido en profundidad
+            // El INodo que recibe es el punto de partida
+
+            vector<INodo*> result;
+            stack<NodoGrafo*> nodosProcesados;
+            int visitados = 0;
+            
+            resetNodes();
+
+            NodoGrafo* puntoPartida = this->getNodo(pOrigen->getId());
+            nodosProcesados.push(puntoPartida);
+            puntoPartida->setProcesado(true);
+            
+            do {
+                while (!nodosProcesados.empty()) {
+                    NodoGrafo* actual = nodosProcesados.top();
+                    nodosProcesados.pop();
+
+                    actual->setVisitado(true);
+                    visitados++;
+                    result.push_back(actual->getInfo()); // agregamos el nodo visitado al recorrido
+
+                    vector<Arco*> *adyacentes = actual->getArcs();
+
+                    for (int indiceArcos=0; indiceArcos<adyacentes->size(); ++indiceArcos) {
+                        // recorremos los arcos para encontrar los nodos adyacentes
+
+                        Arco* arco = adyacentes->at(indiceArcos);
+                        NodoGrafo* adyacente = (NodoGrafo*)arco->getDestino();
+
+                        if (!adyacente->getProcesado()) {
+                            nodosProcesados.push(adyacente);
+                            adyacente->setProcesado(true);
+                        }
+                    }
+                }
+
+                if (visitados < this->getSize()) {
+                    // si todavía no hemos visitado todos, hacemos otro recorrido a partir de un nuevo punto de partida
+                    puntoPartida = this->findNotVisited();
+                    nodosProcesados.push(puntoPartida);
+                    puntoPartida->setProcesado(true);
+                }
+                
+            } while (visitados < this->getSize());
 
             return result;
         } 
 
-        vector<INodo*> broadPath(INodo* pOrigen) {
+        vector<INodo*> broadPath(INodo* pOrigen) { // recorrido en anchura
+            // El INodo que recibe es el punto de partida
+
             vector<INodo*> result;
             queue<NodoGrafo*> nodosProcesados;
             int visitados = 0;
@@ -99,35 +146,38 @@ class Grafo {
 
             NodoGrafo* puntoPartida = this->getNodo(pOrigen->getId());
             nodosProcesados.push(puntoPartida);
-            puntoPartida->procesado = true;
+            puntoPartida->setProcesado(true);
             
             do {
                 while (!nodosProcesados.empty()) {
                     NodoGrafo* actual = nodosProcesados.front();
                     nodosProcesados.pop();
 
-                    actual->visitado = true;
+                    actual->setVisitado(true);
                     visitados++;
-                    result.push_back(actual->getInfo());
+                    result.push_back(actual->getInfo()); // agregamos el nodo visitado al recorrido
 
                     vector<Arco*> *adyacentes = actual->getArcs();
 
-                    for (int indiceArcos=0; indiceArcos<adyacentes->size(); ++indiceArcos) {
-                        Arco* arco = adyacentes->at(indiceArcos);
+                    for (Arco* arco : *adyacentes) {
+                        // recorremos los arcos para encontrar los nodos adyacentes
                         NodoGrafo* adyacente = (NodoGrafo*)arco->getDestino();
-                        if (!adyacente->procesado) {
+
+                        if (!adyacente->getProcesado()) {
                             nodosProcesados.push(adyacente);
-                            adyacente->procesado = true;
+                            adyacente->setProcesado(true);
                         }
                     }
                 }
 
-                if (visitados<this->getSize()) {
+                if (visitados < this->getSize()) {
+                    // si todavía no hemos visitado todos, hacemos otro recorrido a partir de un nuevo punto de partida
                     puntoPartida = this->findNotVisited();
                     nodosProcesados.push(puntoPartida);
-                    puntoPartida->procesado = true;
+                    puntoPartida->setProcesado(true);
                 }
-            } while (visitados<this->getSize()); 
+
+            } while (visitados < this->getSize()); 
 
             return result;
         }

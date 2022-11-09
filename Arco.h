@@ -1,7 +1,7 @@
 #ifndef _ARCO_
 #define _ARCO_ 1
 
-#include "Nodo.h"
+#include "INodo.h"
 
 using namespace std;
 
@@ -28,10 +28,6 @@ class Arco {
 
         int getPeso() {
             return this->peso;
-        }
-
-        bool equals(Arco pArco){
-            return destino == pArco.getDestino();
         }
 };
 

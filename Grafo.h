@@ -15,7 +15,7 @@ class Grafo {
     private:
         vector<NodoGrafo*> listaNodos; // Contiene todos los nodos del grafo
         bool esDirigido = true; // indica si es un grafo dirigido. Se usa para establecer los arcos. Si es dirigido, solo tiene que hacer uno
-        // pero si no es dirigido, tiene que hacer ida y vuelta
+                                // pero si no es dirigido, tiene que hacer ida y vuelta
         std::map<int,NodoGrafo*> hashNodos; // se usa para buscar el nodo más fácilmente.
 
         // esta función se usa para restaurar los valores de los nodos de visitado y procesado para el siguiente recorrido
@@ -96,11 +96,11 @@ class Grafo {
 
 
         // Esta función es el recorrido en profundidad
-        vector<INodo*> deepPath(INodo* pOrigen) {  // recorrido en profundidad
+        vector<INodo*> deepPath(INodo* pOrigen) {
             // El INodo que recibe es el punto de partida
 
             vector<INodo*> result; // aquí se van a almacenar los nodos visitados
-            stack<NodoGrafo*> nodosProcesados; // Esta es la pila de 
+            stack<NodoGrafo*> nodosProcesados; // pila de nodos procesados
             int visitados = 0; // Tiene un contador de la cantidad de visitados
             
             resetNodes(); // restaura todos los nodos para que no aparezcan como visitados
